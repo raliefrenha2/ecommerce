@@ -27,5 +27,7 @@ Route::group(['prefix' => 'administrator', 'middleware' => 'auth'], function() {
 
     //INI ADALAH ROUTE BARU
     Route::resource('category', 'CategoryController')->except(['create', 'show']);
-    Route::resource('product', 'ProductController');
+    Route::resource('product', 'ProductController')->except(['show']);
+    Route::get('/product/bulk', 'ProductController@massUploadForm')->name('product.bulk'); //TAMBAHKAN ROUTE INI
+    Route::post('/product/bulk', 'ProductController@massUpload')->name('product.saveBulk');
 });
