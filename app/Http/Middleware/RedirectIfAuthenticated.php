@@ -20,6 +20,7 @@ class RedirectIfAuthenticated
     {
         if (Auth::guard($guard)->check()) {
             return redirect(RouteServiceProvider::HOME);
+            // return redirect('/administrator/home'); //UBAH BAGIAN INI
         }
 
         return $next($request);
