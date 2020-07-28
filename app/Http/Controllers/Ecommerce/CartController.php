@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Ecommerce;
 
 use App\Http\Controllers\Controller;
+use App\Mail\CustomerRegisterMail; //chap 10
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use App\City;
@@ -13,6 +14,7 @@ use App\Province;
 use App\Order;
 use App\OrderDetail;
 use DB;
+use Mail; //cahp 10
 
 class CartController extends Controller
 {
@@ -145,9 +147,11 @@ class CartController extends Controller
 	        $customer = Customer::create([
 	            'name' => $request->customer_name,
 	            'email' => $request->email,
+	            'password' => $password,
 	            'phone_number' => $request->customer_phone,
 	            'address' => $request->customer_address,
 	            'district_id' => $request->district_id,
+	            'activate_token' => Str::random(30), //TAMBAKAN LINE INI
 	            'status' => false
 	        ]);
 
@@ -182,6 +186,8 @@ class CartController extends Controller
 	        $carts = [];
 	        //KOSONGKAN DATA KERANJANG DI COOKIE
 	        $cookie = cookie('dw-carts', json_encode($carts), 2880);
+
+	        Mail::to($request->email)->send(new CustomerRegisterMail($customer, $password)); //TAMBAHKAN CODE INI SAJA  chap c10
 	        //REDIRECT KE HALAMAN FINISH TRANSAKSI
 	        return redirect(route('front.finish_checkout', $order->invoice))->cookie($cookie);
 	    } catch (\Exception $e) {
