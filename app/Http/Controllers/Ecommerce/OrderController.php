@@ -20,7 +20,7 @@ class OrderController extends Controller
 	public function view($invoice)
 	{
 	    $order = Order::with(['district.city.province', 'details', 'details.product', 'payment'])
-			->where('invoice', $invoice)->first();
+			->where('invoice', $invoice)->firstOrFail();
 				
 		//JADI KITA CEK, VALUE forUser() NYA ADALAH CUSTOMER YANG SEDANG LOGIN
 		//DAN ALLOW NYA MEMINTA DUA PARAMETER
@@ -54,7 +54,8 @@ class OrderController extends Controller
 	    DB::beginTransaction();
 	    try {
 	        //AMBIL DATA ORDER BERDASARKAN INVOICE ID
-	        $order = Order::where('invoice', $request->invoice)->first();
+			$order = Order::where('invoice', $request->invoice)->first();
+			if ($order->subtotal != $request->amount) return redirect()->back()->with(['error' => 'Error, Pembayaran Harus Sama Dengan Tagihan']); //HANYA TAMBAHKAN CODE INI
 	        //JIKA STATUSNYA MASIH 0 DAN ADA FILE BUKTI TRANSFER YANG DI KIRIM
 	        if ($order->status == 0 && $request->hasFile('proof')) {
 	            //MAKA UPLOAD FILE GAMBAR TERSEBUT
