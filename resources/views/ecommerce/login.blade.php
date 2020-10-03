@@ -33,10 +33,11 @@
                     @if (session('error'))
                         <div class="alert alert-danger">{{ session('error') }}</div>
                     @endif
-
+{{-- {{dd(auth())}} --}}
 					<div class="login_form_inner">
-						<h3>Log in to enter</h3>
+						<h3>Log in to enter h</h3>
 						<form class="row login_form" action="{{ route('customer.post_login') }}" method="post" id="contactForm" novalidate="novalidate">
+							@csrf
 							<div class="col-md-12 form-group">
 								<input type="email" class="form-control" id="email" name="email" placeholder="Email Address">
 							</div>

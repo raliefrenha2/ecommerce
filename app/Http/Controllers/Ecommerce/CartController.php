@@ -144,6 +144,7 @@ class CartController extends Controller
 	        });
 
 	        //SIMPAN DATA CUSTOMER BARU
+	        $password = Str::random(8); //TAMBAHKAN LINE INI
 	        $customer = Customer::create([
 	            'name' => $request->customer_name,
 	            'email' => $request->email,
