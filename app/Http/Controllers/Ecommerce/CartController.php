@@ -113,6 +113,7 @@ class CartController extends Controller
 
 	public function processCheckout(Request $request)
 	{
+		dd($request->all());
 	    //VALIDASI DATANYA
 	    $this->validate($request, [
 	        'customer_name' => 'required|string|max:100',
@@ -131,7 +132,7 @@ class CartController extends Controller
 	        //CHECK DATA CUSTOMER BERDASARKAN EMAIL
 	        $customer = Customer::where('email', $request->email)->first();
 	        //JIKA DIA TIDAK LOGIN DAN DATA CUSTOMERNYA ADA
-	        if (!auth()->check() && $customer) {
+	        if (!auth()->guard('customer')->check() && $customer) {
 	            //MAKA REDIRECT DAN TAMPILKAN INSTRUKSI UNTUK LOGIN 
 	            return redirect()->back()->with(['error' => 'Silahkan Login Terlebih Dahulu']);
 	        }
@@ -141,20 +142,23 @@ class CartController extends Controller
 	        //HITUNG SUBTOTAL BELANJAAN
 	        $subtotal = collect($carts)->sum(function($q) {
 	            return $q['qty'] * $q['product_price'];
-	        });
+			});
+			
+			if (!auth()->guard('customer')->check()) {
+				//SIMPAN DATA CUSTOMER BARU
+				$password = Str::random(8); //TAMBAHKAN LINE INI
+				$customer = Customer::create([
+					'name' => $request->customer_name,
+					'email' => $request->email,
+					'password' => $password,
+					'phone_number' => $request->customer_phone,
+					'address' => $request->customer_address,
+					'district_id' => $request->district_id,
+					'activate_token' => Str::random(30), //TAMBAKAN LINE INI
+					'status' => false
+				]);
+			}
 
-	        //SIMPAN DATA CUSTOMER BARU
-	        $password = Str::random(8); //TAMBAHKAN LINE INI
-	        $customer = Customer::create([
-	            'name' => $request->customer_name,
-	            'email' => $request->email,
-	            'password' => $password,
-	            'phone_number' => $request->customer_phone,
-	            'address' => $request->customer_address,
-	            'district_id' => $request->district_id,
-	            'activate_token' => Str::random(30), //TAMBAKAN LINE INI
-	            'status' => false
-	        ]);
 
 	        //SIMPAN DATA ORDER
 	        $order = Order::create([
@@ -188,7 +192,9 @@ class CartController extends Controller
 	        //KOSONGKAN DATA KERANJANG DI COOKIE
 	        $cookie = cookie('dw-carts', json_encode($carts), 2880);
 
-	        Mail::to($request->email)->send(new CustomerRegisterMail($customer, $password)); //TAMBAHKAN CODE INI SAJA  chap c10
+			if (!auth()->guard('customer')->check()) {
+				Mail::to($request->email)->send(new CustomerRegisterMail($customer, $password)); //TAMBAHKAN CODE INI SAJA  chap c10
+			}
 	        //REDIRECT KE HALAMAN FINISH TRANSAKSI
 	        return redirect(route('front.finish_checkout', $order->invoice))->cookie($cookie);
 	    } catch (\Exception $e) {
