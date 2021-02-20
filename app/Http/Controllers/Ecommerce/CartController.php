@@ -113,7 +113,6 @@ class CartController extends Controller
 
 	public function processCheckout(Request $request)
 	{
-		dd($request->all());
 	    //VALIDASI DATANYA
 	    $this->validate($request, [
 	        'customer_name' => 'required|string|max:100',
