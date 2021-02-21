@@ -48,6 +48,8 @@ Route::group(['prefix' => 'administrator', 'middleware' => 'auth'], function() {
         Route::get('/{invoice}', 'OrderController@view')->name('orders.view');
         Route::get('/payment/{invoice}', 'OrderController@acceptPayment')->name('orders.approve_payment');
         Route::post('/shipping', 'OrderController@shippingOrder')->name('orders.shipping');
+        Route::get('/return/{invoice}', 'OrderController@return')->name('orders.return');
+        Route::post('/return', 'OrderController@approveReturn')->name('orders.approve_return');
         
         //SEMUA ROUTE BARU SEPANJANG ARTIKEL INI AKAN DISIMPAN DI DALAM BLOCK CODE INI
     });

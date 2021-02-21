@@ -12,7 +12,7 @@ class OrderReturn extends Model
     public function getStatusLabelAttribute()
 	{
 	    if ($this->status == 0) {
-	        $status = '<span class="badge badge-secondary">Pending</span>';
+	        $status = '<span class="badge badge-secondary">Menunggu Konfirmasi</span>';
 	    } elseif ($this->status == 1) {
 	        $status = '<span class="badge badge-primary">Diterima</span>';
 	    } elseif ($this->status == 2) {
